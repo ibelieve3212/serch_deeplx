@@ -1,3 +1,5 @@
+import requests
+import time
 import asyncio
 import json
 import aiofiles
@@ -23,21 +25,19 @@ async def check_url(session: ClientSession, url: str, max_retries=3):
         'Content-Type': 'application/json'
     }
 
-    for attempt in range(1, max_retries + 1):
+    for i in range(max_retries):
         try:
-            requests_url = url + "/translate"
-            async with session.post(requests_url, headers=headers, data=payload) as response:
-                response.raise_for_status()  
-                response_json = await response.json()
-                print(url, response_json)
-                return url, response_json
+            start_time = time.time()
+            response = requests.post(url, headers=headers, data=payload, timeout=5)
+            if response.status_code == 200 and ('data' in response.json() and len(str(response.json().get("data"))) > 0):
+                return url, response.json()
+            else:
+                raise Exception("Invalid response")
         except Exception as e:
-            print(f"Error for URL {url} (Attempt {attempt}/{max_retries}): {e}")
-            if attempt < max_retries:
-                await asyncio.sleep(1)  
-
-    print(f"All {max_retries} attempts failed. Defaulting to failure.")
+            print(f"请求失败，接口：{url}，错误：{e}")
+    
     return url, {'code': None, 'data': None}  
+
 
 async def process_urls(input_file, success_file):
     """
