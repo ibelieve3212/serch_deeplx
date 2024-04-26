@@ -96,3 +96,4 @@ http://203.25.119.208:1188/translate
 http://152.67.211.94:1188/translate
 http://107.175.28.239:1188/translate
 http://deeplx.hc-beijing.rhythmlian.cn/translate
+http://152.67.208.218:8000/translate
